@@ -7,11 +7,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: SearchAdapter
-    private val allResults = mutableListOf<SearchResult>() // Crawler data store
+    // Aapka Supabase details yahan hai
+    private val supabaseUrl = "https://jhyqyskemsvoizmmupka.supabase.co/"
+    private val apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeXF5c2tlbXN2b2l6bW11cGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NDQ5ODUsImV4cCI6MjA4NzQyMDk4NX0.IvjAWJZ4DeOCNG0SzKgV5P-LXW2aYvX_RA-NDw5S-ec"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,41 +29,33 @@ class MainActivity : AppCompatActivity() {
         rvResults.layoutManager = LinearLayoutManager(this)
         rvResults.adapter = adapter
 
-        // Search Action (Google/Yahoo Flow)
+        // Supabase Engine Setup
+        val retrofit = Retrofit.Builder()
+            .baseUrl(supabaseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val api = retrofit.create(SupabaseApi::class.java)
+
         etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = etSearch.text.toString().trim().lowercase()
+                val query = etSearch.text.toString().trim()
                 if (query.isNotEmpty()) {
-                    performSearchFlow(query)
+                    // Google/Yahoo search flow
+                    CoroutineScope(Dispatchers.Main).launch {
+                        try {
+                            // Ye line database se matching results mangwati hai
+                            val results = withContext(Dispatchers.IO) {
+                                api.getSearchResults("ilike.*$query*", apiKey, "Bearer $apiKey")
+                            }
+                            adapter.updateData(results)
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Search Error!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
                 true
             } else false
         }
-        
-        loadCrawlerData() // Initialize data
-    }
-
-    private fun loadCrawlerData() {
-        // Sample Data: Yahan aapka 70.3k data JSON load hoga
-        allResults.add(SearchResult("Streekx Search Engine", "https://streekx.com", "The next gen search engine for everyone."))
-        allResults.add(SearchResult("Android Development Guide", "https://developer.android.com", "Learn how to build native apps with Kotlin."))
-        // ... baki 70k data background mein load hoga
-    }
-
-    private fun performSearchFlow(query: String) {
-        // Google/Yahoo Ranking Logic:
-        // 1. Pehle titles match karo
-        // 2. Phir relevance ke hisaab se sort karo
-        val filtered = allResults.filter { 
-            it.title.lowercase().contains(query) || it.description.lowercase().contains(query)
-        }.sortedByDescending { 
-            it.title.lowercase().startsWith(query) // Exact match hamesha top par
-        }
-
-        if (filtered.isEmpty()) {
-            Toast.makeText(this, "No matching results found in Streekx Index", Toast.LENGTH_SHORT).show()
-        }
-        
-        adapter.updateData(filtered)
     }
 }
