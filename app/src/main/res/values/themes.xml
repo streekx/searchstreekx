@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Streekx" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#6001D2</item>
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
