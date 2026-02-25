@@ -1,5 +1,7 @@
 package com.streekx.search
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +28,12 @@ class SearchAdapter(private var results: List<SearchResult>) :
         holder.tvTitle.text = result.title
         holder.tvUrl.text = result.link
         holder.tvDescription.text = result.description
+
+        // Click logic: Click karte hi browser/webview khulega
+        holder.itemView.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(result.link))
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount() = results.size
