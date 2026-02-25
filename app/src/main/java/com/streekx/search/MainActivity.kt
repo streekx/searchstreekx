@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: SearchAdapter
-    private val allResults = mutableListOf<SearchResult>() // Yahan 70.3k data load hoga
+    private val allResults = mutableListOf<SearchResult>() // Crawler data store
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,37 +20,45 @@ class MainActivity : AppCompatActivity() {
         val etSearch = findViewById<EditText>(R.id.etSearch)
         val rvResults = findViewById<RecyclerView>(R.id.rvResults)
 
-        // Setup RecyclerView
-        adapter = SearchAdapter(allResults)
+        adapter = SearchAdapter(mutableListOf())
         rvResults.layoutManager = LinearLayoutManager(this)
         rvResults.adapter = adapter
 
-        // Search Action
+        // Search Action (Google/Yahoo Flow)
         etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = etSearch.text.toString().lowercase()
-                filterResults(query)
+                val query = etSearch.text.toString().trim().lowercase()
+                if (query.isNotEmpty()) {
+                    performSearchFlow(query)
+                }
                 true
             } else false
         }
         
-        loadCrawlerData()
+        loadCrawlerData() // Initialize data
     }
 
     private fun loadCrawlerData() {
-        // Filhal ke liye testing data, yahan hum aapki crawler file connect karenge
-        allResults.add(SearchResult("Streekx Official Site", "https://streekx.com", "Welcome to Streekx Search Engine."))
-        // 70.3k data ko load karne ke liye hum JSON ka use karenge
+        // Sample Data: Yahan aapka 70.3k data JSON load hoga
+        allResults.add(SearchResult("Streekx Search Engine", "https://streekx.com", "The next gen search engine for everyone."))
+        allResults.add(SearchResult("Android Development Guide", "https://developer.android.com", "Learn how to build native apps with Kotlin."))
+        // ... baki 70k data background mein load hoga
     }
 
-    private fun filterResults(query: String) {
-        val filteredList = allResults.filter { 
-            it.title.lowercase().contains(query) || it.description.lowercase().contains(query) 
+    private fun performSearchFlow(query: String) {
+        // Google/Yahoo Ranking Logic:
+        // 1. Pehle titles match karo
+        // 2. Phir relevance ke hisaab se sort karo
+        val filtered = allResults.filter { 
+            it.title.lowercase().contains(query) || it.description.lowercase().contains(query)
+        }.sortedByDescending { 
+            it.title.lowercase().startsWith(query) // Exact match hamesha top par
         }
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No results found", Toast.LENGTH_SHORT).show()
+
+        if (filtered.isEmpty()) {
+            Toast.makeText(this, "No matching results found in Streekx Index", Toast.LENGTH_SHORT).show()
         }
-        adapter.updateData(filteredList)
+        
+        adapter.updateData(filtered)
     }
 }
-
