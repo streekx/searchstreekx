@@ -12,9 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var adapter: SearchAdapter
-    // Aapka Supabase details yahan hai
     private val supabaseUrl = "https://jhyqyskemsvoizmmupka.supabase.co/"
     private val apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeXF5c2tlbXN2b2l6bW11cGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NDQ5ODUsImV4cCI6MjA4NzQyMDk4NX0.IvjAWJZ4DeOCNG0SzKgV5P-LXW2aYvX_RA-NDw5S-ec"
 
@@ -24,27 +22,21 @@ class MainActivity : AppCompatActivity() {
 
         val etSearch = findViewById<EditText>(R.id.etSearch)
         val rvResults = findViewById<RecyclerView>(R.id.rvResults)
-
         adapter = SearchAdapter(mutableListOf())
         rvResults.layoutManager = LinearLayoutManager(this)
         rvResults.adapter = adapter
 
-        // Supabase Engine Setup
-        val retrofit = Retrofit.Builder()
+        val api = Retrofit.Builder()
             .baseUrl(supabaseUrl)
             .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val api = retrofit.create(SupabaseApi::class.java)
+            .build().create(SupabaseApi::class.java)
 
         etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = etSearch.text.toString().trim()
                 if (query.isNotEmpty()) {
-                    // Google/Yahoo search flow
                     CoroutineScope(Dispatchers.Main).launch {
                         try {
-                            // Ye line database se matching results mangwati hai
                             val results = withContext(Dispatchers.IO) {
                                 api.getSearchResults("ilike.*$query*", apiKey, "Bearer $apiKey")
                             }
