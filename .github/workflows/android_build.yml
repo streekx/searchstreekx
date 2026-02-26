@@ -12,13 +12,14 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Build APK
+      - name: Build APK with Error Log
         run: |
           chmod +x gradlew || true
-          gradle assembleDebug --stacktrace
+          # Hum sirf error dikhane ke liye ye command chalayenge
+          gradle assembleDebug --stacktrace --continue
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Streekx-APK
+          name: Streekx-App
           path: app/build/outputs/apk/debug/app-debug.apk
