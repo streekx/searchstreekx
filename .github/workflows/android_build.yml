@@ -1,4 +1,4 @@
-name: Build Streekx
+     name: Build Streekx
 on: [push]
 jobs:
   build:
