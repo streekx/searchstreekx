@@ -1,37 +1,39 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <ImageView
+        android:id="@+id/streekxDoodle"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/streekx_doodle" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF">
+        android:layout_height="54dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/search_bg"
+        android:paddingHorizontal="15dp"
+        android:gravity="center_vertical">
         
-        <LinearLayout
+        <EditText
+            android:id="@+id/etSearch"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-            
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Streekx"
-                android:textColor="#6001D2"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <include layout="@layout/search_bar_layout" /> 
-        </LinearLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+            android:layout_height="match_parent"
+            android:hint="Search Streekx..."
+            android:background="@null"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColor="#000000"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResults"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+        android:layout_height="match_parent" />
+</LinearLayout>
